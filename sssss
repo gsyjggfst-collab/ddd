@@ -1,0 +1,276 @@
+-- Roblox FE Script: เบค่อน888 V3 [Ultimate Cheat Hub]
+-- Compatible with Xeno Executor & Mobile / PC
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
+
+-- ค่าการปรับแต่งเริ่มต้น
+local Settings = {
+	WalkSpeed = 100,
+	JumpPower = 120,
+	FlySpeed = 60,
+	Aimbot = false,
+	InfJump = false,
+	Speed = false,
+	Jump = false,
+	Invis = false,
+	Noclip = false,
+	Fly = false,
+	ESP = false
+}
+
+-- สร้าง ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local ToggleUIRound = Instance.new("TextButton")
+local ScrollContainer = Instance.new("ScrollingFrame")
+local UIListLayout = Instance.new("UIListLayout")
+
+ScreenGui.Name = "Bacon888_V3"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Frame หลัก (ธีมเบค่อนส้ม-ดำ)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
+MainFrame.Size = UDim2.new(0, 220, 0, 380)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- หัวข้อเมนู
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(210, 70, 30)
+Title.Size = UDim2.new(1, -30, 0, 35)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "🥓 เบค่อน888 V3 [ULTIMATE]"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 15
+
+-- ปุ่มย่อ/ขยาย เมนู
+ToggleUIRound.Name = "ToggleUIRound"
+ToggleUIRound.Parent = MainFrame
+ToggleUIRound.BackgroundColor3 = Color3.fromRGB(150, 40, 20)
+ToggleUIRound.Position = UDim2.new(1, -30, 0, 0)
+ToggleUIRound.Size = UDim2.new(0, 30, 0, 35)
+ToggleUIRound.Font = Enum.Font.SourceSansBold
+ToggleUIRound.Text = "-"
+ToggleUIRound.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleUIRound.TextSize = 20
+
+local isMinimized = false
+ToggleUIRound.MouseButton1Click:Connect(function()
+	isMinimized = not isMinimized
+	ScrollContainer.Visible = not isMinimized
+	MainFrame.Size = isMinimized and UDim2.new(0, 220, 0, 35) or UDim2.new(0, 220, 0, 380)
+	ToggleUIRound.Text = isMinimized and "+" or "-"
+end)
+
+-- พื้นที่ใส่ปุ่มแบบเลื่อนลงได้ (Scrollable)
+ScrollContainer.Name = "ScrollContainer"
+ScrollContainer.Parent = MainFrame
+ScrollContainer.BackgroundTransparency = 1
+ScrollContainer.Position = UDim2.new(0, 0, 0, 40)
+ScrollContainer.Size = UDim2.new(1, 0, 1, -40)
+ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 520)
+ScrollContainer.ScrollBarThickness = 6
+
+UIListLayout.Parent = ScrollContainer
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 6)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- ฟังก์ชันสร้างปุ่มสวิตช์
+local function createButton(text, key, order)
+	local btn = Instance.new("TextButton")
+	btn.Parent = ScrollContainer
+	btn.Size = UDim2.new(0.9, 0, 0, 36)
+	btn.BackgroundColor3 = Color3.fromRGB(110, 35, 35)
+	btn.Font = Enum.Font.SourceSansBold
+	btn.Text = text .. ": ปิด"
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.TextSize = 13
+	btn.LayoutOrder = order
+
+	btn.MouseButton1Click:Connect(function()
+		Settings[key] = not Settings[key]
+		if Settings[key] then
+			btn.Text = text .. ": เปิด"
+			btn.BackgroundColor3 = Color3.fromRGB(230, 90, 30)
+		else
+			btn.Text = text .. ": ปิด"
+			btn.BackgroundColor3 = Color3.fromRGB(110, 35, 35)
+		end
+	end)
+	return btn
+end
+
+-- สร้างปุ่มการใช้งานต่าง ๆ
+createButton("🏃 วิ่งเร็ว (Speed) [Z]", "Speed", 1)
+createButton("🦘 โดดสูง (Jump) [C]", "Jump", 2)
+createButton("👻 ล่องหน (Invis) [X]", "Invis", 3)
+createButton("🧱 ทะลุกำแพง (Noclip) [N]", "Noclip", 4)
+createButton("🕊️ ระบบบิน (Fly) [F]", "Fly", 5)
+createButton("👁️ มองทะลุ (ESP Players)", "ESP", 6)
+createButton("🎯 ล็อกเป้าใกล้สุด (Aimbot)", "Aimbot", 7)
+createButton("🌌 โดดไร้ขีดจำกัด (Inf Jump)", "InfJump", 8)
+
+-- ปุ่มวาร์ปไปหาคนอื่น
+local TPBtn = Instance.new("TextButton")
+TPBtn.Parent = ScrollContainer
+TPBtn.Size = UDim2.new(0.9, 0, 0, 36)
+TPBtn.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+TPBtn.Font = Enum.Font.SourceSansBold
+TPBtn.Text = "🌐 วาร์ปไปหาคนสุ่ม (Random TP)"
+TPBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TPBtn.TextSize = 13
+TPBtn.LayoutOrder = 9
+
+TPBtn.MouseButton1Click:Connect(function()
+	local allPlrs = {}
+	for _, v in ipairs(Players:GetPlayers()) do
+		if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+			table.insert(allPlrs, v)
+		end
+	end
+	if #allPlrs > 0 then
+		local target = allPlrs[math.random(1, #allPlrs)]
+		if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+		end
+	end
+end)
+
+-- ระบบกระโดดไร้ขีดจำกัด (Infinite Jump)
+UserInputService.JumpRequest:Connect(function()
+	if Settings.InfJump then
+		local char = LocalPlayer.Character
+		if char and char:FindFirstChildOfClass("Humanoid") then
+			char:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+-- ระบบบิน (Fly Logic)
+local bodyGyro, bodyVelocity
+local function manageFly()
+	local char = LocalPlayer.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+	local root = char.HumanoidRootPart
+
+	if Settings.Fly then
+		if not bodyGyro then
+			bodyGyro = Instance.new("BodyGyro")
+			bodyGyro.P = 9e4
+			bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+			bodyGyro.Parent = root
+		end
+		if not bodyVelocity then
+			bodyVelocity = Instance.new("BodyVelocity")
+			bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+			bodyVelocity.Parent = root
+		end
+		
+		bodyGyro.CFrame = Camera.CFrame
+		local moveDir = Vector3.new()
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + Camera.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - Camera.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - Camera.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + Camera.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0, 1, 0) end
+
+		bodyVelocity.Velocity = moveDir * Settings.FlySpeed
+	else
+		if bodyGyro then bodyGyro:Destroy() bodyGyro = nil end
+		if bodyVelocity then bodyVelocity:Destroy() bodyVelocity = nil end
+	end
+end
+
+-- ฟังก์ชันหาศัตรูใกล้สุดสำหรับ Aimbot
+local function getClosestPlayer()
+	local closest, maxDist = nil, math.huge
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+			local pos, onScreen = Camera:WorldToViewportPoint(plr.Character.Head.Position)
+			if onScreen then
+				local dist = (Vector2.new(pos.X, pos.Y) - UserInputService:GetMouseLocation()).Magnitude
+				if dist < maxDist then
+					closest = plr.Character.Head
+					maxDist = dist
+				end
+			end
+		end
+	end
+	return closest
+end
+
+-- ลูปการทำงานหลัก (Main Heartbeat Loop)
+RunService.RenderStepped:Connect(function()
+	local char = LocalPlayer.Character
+	if not char then return end
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+
+	-- 1. วิ่งเร็ว & โดดสูง
+	if humanoid then
+		humanoid.WalkSpeed = Settings.Speed and Settings.WalkSpeed or 16
+		humanoid.JumpPower = Settings.Jump and Settings.JumpPower or 50
+	end
+
+	-- 2. ล่องหน
+	for _, v in ipairs(char:GetDescendants()) do
+		if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+			v.LocalTransparencyModifier = Settings.Invis and 1 or 0
+		elseif v:IsA("Decal") then
+			v.Transparency = Settings.Invis and 1 or 0
+		end
+	end
+
+	-- 3. เดินทะลุกำแพง (Noclip)
+	if Settings.Noclip then
+		for _, part in ipairs(char:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = false
+			end
+		end
+	end
+
+	-- 4. บิน
+	manageFly()
+
+	-- 5. ล็อกเป้า (Aimbot)
+	if Settings.Aimbot then
+		local targetHead = getClosestPlayer()
+		if targetHead then
+			Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
+		end
+	end
+end)
+
+-- ระบบ ESP มองทะลุ
+RunService.Stepped:Connect(function()
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer and plr.Character then
+			local hl = plr.Character:FindFirstChild("Bacon888_ESP")
+			if Settings.ESP then
+				if not hl then
+					hl = Instance.new("Highlight")
+					hl.Name = "Bacon888_ESP"
+					hl.Parent = plr.Character
+					hl.FillColor = Color3.fromRGB(255, 80, 0)
+					hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+				end
+			else
+				if hl then hl:Destroy() end
+			end
+		end
+	end
+end)
